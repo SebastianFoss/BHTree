@@ -13,4 +13,6 @@ add_executable(Globulus main.cpp
         BHtree.cpp
         BHtree.h
         NodePool.cpp
-        NodePool.h)
+        NodePool.h
+        Box.cpp
+        Box.h)

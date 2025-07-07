@@ -6,6 +6,7 @@
 #define PARTICLE_H
 #include "Vec.h"
 
+// only allow explicit declaration
 
 class Particle {
 private:
@@ -13,8 +14,13 @@ private:
     double mass;
 
 public:
-    Particle(Vec pos, double mass) : pos(pos), mass(0) {}
+    Particle(Vec pos, double mass) : pos(pos), mass(mass) {}
+    // will be allocated with std::make_unique, on heap
 
+
+    // time step components
+    void updatePos(double dt);
+    void updateVel(double dt);
 };
 
 
