@@ -10,17 +10,22 @@
 
 class Particle {
 private:
-    Vec pos;
+    Vec* pos;
     double mass;
 
 public:
-    Particle(Vec pos, double mass) : pos(pos), mass(mass) {}
+    Particle(Vec pos, double mass) : mass(mass) {
+        this->pos = new Vec(pos);
+    }
     // will be allocated with std::make_unique, on heap
 
+    // getters
+    Vec getPos();
+    double getMass();
 
-    // time step components
-    void updatePos(double dt);
-    void updateVel(double dt);
+    ~Particle() {
+        delete pos;
+    }
 };
 
 

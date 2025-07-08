@@ -22,7 +22,7 @@ public:
     // reserve(initialCapacity) -- reserves heap allocation in mem
     // emplace_back() -- calls the Node constructor for each node within pool_memory
     // free_nodes.push_back(...) adds pointers to Nodes to the free list, frees memory.
-    NodePool(size_t initialCapacity);
+    NodePool(size_t initSize);
 
 
     // pops a node from free_nodes for use, and calls node->reset

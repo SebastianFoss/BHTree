@@ -3,3 +3,10 @@
 //
 
 #include "Particle.h"
+
+Vec Particle::getPos() {
+    return *pos;
+}
+double Particle::getMass() {
+    return mass;
+}
