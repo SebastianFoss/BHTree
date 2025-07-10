@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.31)
-project(Globulus)
+project(BHTree)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(Globulus main.cpp
+add_executable(BHTree main.cpp
         Particle.cpp
         Particle.h
         Vec.cpp

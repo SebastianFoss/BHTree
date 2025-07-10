@@ -12,6 +12,8 @@
 #include "NodePool.h"
 #include "Particle.h"
 
+// class invariants yet to be added
+
 class Node {
 
 private:
@@ -32,17 +34,46 @@ private:
 public:
 
     // initializes Node with designated bounds as Box struct
-    Node(Box box);
+    Node(Box box)
+        // initialze every member to zero -- all are contingent on adding particles
+        : box(box),
+        isLeaf(true), // a new node starts as a potential leaf, and only becomes internal when subdivision is necessary
+        centerOfMass(0,0,0),
+        totalMass(0) {
+        for (int i = 0; i < 8; i++) {
+            this->children[i] = nullptr;
+        }
+        // particles_in_node_for_build is null by default.
+    };
 
     // for when a Node is reused from the pool
     // resets leaf status, clears particles, sets m to 0, deallocates arr
-    void reset();
+    // clears any state from its previous use in the tree.
+    void reset() {
+
+        // sets vector values to zero.
+        centerOfMass.reset();
+
+        // reset members
+        totalMass = 0;
+        isLeaf = true;
+
+        // CRUCIALLY: reset particles in node for build to zero. This ensures the particles are not re-initialized.
+        particles_in_node_for_build.clear();
+
+        // set all children node ptrs to nullptr
+        for (int i = 0; i < 8; i++) {
+            children[i] = nullptr;
+        }
+    };
 
 
     // add a particle to the Node
     // called in recursive function?
     // move semantics?
-    void addParticle(Particle* p);
+    void addParticle(Particle* p) {
+
+    };
 
 
     // recursive function

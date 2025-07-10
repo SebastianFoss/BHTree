@@ -14,6 +14,11 @@ struct Vec {
     double x, y, z;
     Vec(double x, double y, double z) : x(x), y(y), z(z) {}
 
+    // only called to reset a vec to zero vectors for nodepool
+    void reset() {
+        x = y = z = 0;
+    }
+
     // vector operations
 
     Vec operator+(const Vec& rhs) const;
