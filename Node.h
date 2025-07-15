@@ -18,11 +18,14 @@ class Node {
 
 private:
     Box box;
-    Vec centerOfMass;
-    double totalMass;
 
-    // unallocated children
-    std::array<Node*, 8> children;
+    double totalMass;
+    Vec centerOfMass;
+
+
+
+    // if one or no nodes
+    Particle* particle;
 
     // used to keep track of initial particles for construction
     std::vector<Particle*> particles_in_node_for_build;
@@ -38,10 +41,9 @@ public:
         // initialze every member to zero -- all are contingent on adding particles
         : box(box),
         isLeaf(true), // a new node starts as a potential leaf, and only becomes internal when subdivision is necessary
-        centerOfMass(0,0,0),
         totalMass(0) {
-        for (int i = 0; i < 8; i++) {
-            this->children[i] = nullptr;
+        for (Node*& child: children) {
+            child = nullptr;
         }
         // particles_in_node_for_build is null by default.
     };
@@ -62,8 +64,8 @@ public:
         particles_in_node_for_build.clear();
 
         // set all children node ptrs to nullptr
-        for (int i = 0; i < 8; i++) {
-            children[i] = nullptr;
+        for (Node*& child: children) {
+            child = nullptr;
         }
     };
 
@@ -71,17 +73,49 @@ public:
     // add a particle to the Node
     // called in recursive function?
     // move semantics?
-    void addParticle(Particle* p) {
-
+    // pre: assumes particle has a valid state
+    void addParticle(Particle* particle) {
+        // simply push it to the array
+        particles_in_node_for_build.push_back(particle);
     };
 
-
-    // recursive function
+    // the recursive function
     // calls nodepool acquire 8 times to get child nodes
     // calls children[i]->addParticle(...) to distribute the particles
     // recursively calls itself (buildTree) on children[i]
     // clears particles_in_node_for_build for current node if it becomes internal.
-    void buildTree(const std::vector<Particle*>& allParticles, NodePool& pool);
+    void buildTree(const std::vector<Particle*>& allParticles, NodePool& pool) {
+
+        // checks node state on BHTree build
+
+        // TERMINATION CASES
+        // zero particles case
+        // check if node has no particles
+        // is a leaf
+        if (particles_in_node_for_build.empty()) {
+            isLeaf = true;
+            totalMass = 0;
+            // zero vector
+        }
+        // single particle case
+        //
+        if (particles_in_node_for_build.size() == 1) {
+            isLeaf = true;
+            // calculate center of mass
+            return;
+        }
+
+        // Max depth conditional if necessary
+
+        // END TERMINATION CASES
+
+        // SUBDIVISION CASE
+        if (particles_in_node_for_build.size() > 1) {
+            isLeaf = false;
+
+            return;
+        }
+    };
 
     // Calculates Node CoM and total mass based on children's properties.
     // only if leaf?

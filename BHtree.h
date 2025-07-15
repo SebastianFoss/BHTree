@@ -16,6 +16,12 @@
 class BHtree {
 
 private:
+
+    // int max_depth = number of generations / number of branches
+    // int max_particles = the max number of particles?
+    //
+
+
     // the list of initial particle pointers as input
     std::vector<std::unique_ptr<Particle>> particles;
     // the pointers own the particles fully
@@ -40,34 +46,29 @@ private:
         if (particles.empty()) {
             throw std::invalid_argument("BHtree::calculateBounds: particles is empty");
         }
-        double maxi = 0, maxj = 0, maxk = 0;
-        double mini = 0, minj = 0, mink= 0;
-        for (int i = 0; i < particles.size(); i++) {
-            if (particles[i]->getPos().x > maxi) {
-                maxi = particles[i]->getPos().x;
-            }
-            if (particles[i]->getPos().y > maxj) {
-                maxj = particles[i]->getPos().y;
-            }
-            if (particles[i]->getPos().z > maxk) {
-                maxk = particles[i]->getPos().z;
-            }
-            if (particles[i]->getPos().x < mini) {
-                mini = particles[i]->getPos().x;
-            }
-            if (particles[i]->getPos().y < minj) {
-                minj = particles[i]->getPos().y;
-            }
-            if (particles[i]->getPos().z < mink) {
-                mink = particles[i]->getPos().z;
-            }
 
-            Vec lowerBounds(mini, minj, mink );
-            Vec upperBounds(maxi, maxj, maxk);
+        // dx = max(x) - min(x)
+        // dy = max(y) - min(y)
+        // dz = max(z) - min(z)
 
-            box = Box(lowerBounds, upperBounds);
-        }
+        //  L = max ( dx, dy, dz ), + the padding
+
+        // Center = Vec(Cx, Cy, Cz)
+
+
+        // Cx = (Max x + min x) / 2
+        // Cy = ...
     }
+
+
+
+
+    // Children indeces vectorized -> associates particles with a location, and then associates them to a child node
+    // have to check the coordinates to the quarter widths to verify their locations
+    // quad: 0123, top left to br
+    // Particles each have coordinates
+    //
+
 
 public:
 

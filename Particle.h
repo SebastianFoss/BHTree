@@ -8,24 +8,29 @@
 
 // only allow explicit declaration
 
+
+// Particle as an Array
+
+// Nx7 array
 class Particle {
 private:
-    Vec* pos;
+    Vec pos;
+    Vec vel;
+    Vec acc;
     double mass;
+    int id;
 
 public:
     Particle(Vec pos, double mass) : mass(mass) {
-        this->pos = new Vec(pos);
+        // pos = new Vec(pos);
     }
     // will be allocated with std::make_unique, on heap
 
     // getters
-    Vec getPos();
-    double getMass();
-
-    ~Particle() {
-        delete pos;
-    }
+    Vec getPos() const;
+    Vec getVel() const;
+    Vec getAcc() const;
+    double getMass() const;
 };
 
 

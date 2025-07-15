@@ -4,18 +4,27 @@
 
 #ifndef BOX_H
 #define BOX_H
+#include <array>
+
 #include "Vec.h"
+#include "array"
 
 // a simple coordinate system devised to track the bounds of a Node
 
 struct Box {
+    Vec min;
+    Vec max;
 
-    double width;
-    Vec min, max;
+    Box(Vec min, Vec max) : min(min), max(max) {}
+    Box() : min(Vec()),max(Vec()) {} // zero initialized
 
-    Box(Vec min, Vec max) : min(min), max(max) {
-        width = max.x - min.x;
-    }
+
+    // Box[] subdivide() {} // maybe?
+    double getWidth() const {}
+    double getHalfWidth() const {}
+
+    bool contains(Vec p) const {}
+
 };
 
 
