@@ -73,9 +73,16 @@ public:
 
     // unsure?
     // runs release for all nodes.
-    void releaseAllNodes() {
-        for (size_t i = 0; i < free_nodes.size(); i++) {
-            release(pool_memory[i]);
+    void resetPool() {
+        // 1. Clear the current list of free nodes.
+        // This is important because free_nodes_pointers might only contain
+        // a subset of all_nodes_storage if some nodes are currently in use.
+        free_nodes.clear();
+
+        // 2. Add raw pointers of ALL owned Node objects back to the free list.
+        // This effectively marks all nodes as "available" for the next tree build.
+        for (const auto& node_ptr : pool_memory) {
+            free_nodes.push_back(node_ptr.get());
         }
     }
 
