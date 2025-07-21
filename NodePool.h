@@ -49,7 +49,6 @@ public:
         }
     }
 
-
     // expands memory by 2x
     void expandMemory() {
         size_t size = pool_memory.size();
@@ -59,8 +58,6 @@ public:
             free_nodes.push_back(pool_memory.back().get());
         }
     }
-
-
 
     // pushes a node back onto free_nodes.
     void release(Node* node) {
@@ -84,14 +81,9 @@ public:
         for (const auto& node_ptr : pool_memory) {
             free_nodes.push_back(node_ptr.get());
         }
+        // Note: The state of each Node (its Box, totalMass, particle_ptr, children)
+        // is reset *when it's acquired* via acquireNode(), not here.
     }
-
-
-
-
-
-    // destroy nodepool, which calls pool_memory destructor.
-    ~NodePool();
 
 };
 

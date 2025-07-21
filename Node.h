@@ -127,57 +127,13 @@ public:
                 // 4. Insert the new particle into the appropriate child
                 int newID = box.getOctantIndex(newParticle->getPos());
                 if (children[newID] == nullptr) {
-                    children[newID] = pool.acquireNode(children)
+                    children[newID] = pool.acquireNode(children);
                 }
 
             }
         }
 
     };
-
-    // the recursive function
-    // calls nodepool acquire 8 times to get child nodes
-    // calls children[i]->addParticle(...) to distribute the particles
-    // recursively calls itself (buildTree) on children[i]
-    // clears particles_in_node_for_build for current node if it becomes internal.
-    void buildTree(const std::vector<Particle*>& allParticles, NodePool& pool) {
-
-        // checks node state on BHTree build
-
-        // TERMINATION CASES
-        // zero particles case
-        // check if node has no particles
-        // is a leaf
-        if (particles_in_node_for_build.empty()) {
-            isLeaf = true;
-            totalMass = 0;
-            // zero vector
-        }
-        // single particle case
-        //
-        if (particles_in_node_for_build.size() == 1) {
-            isLeaf = true;
-            // calculate center of mass
-            return;
-        }
-
-        // Max depth conditional if necessary
-
-        // END TERMINATION CASES
-
-        // SUBDIVISION CASE
-        if (particles_in_node_for_build.size() > 1) {
-            isLeaf = false;
-
-            return;
-        }
-    };
-
-    // Calculates Node CoM and total mass based on children's properties.
-    // only if leaf?
-    void calculateCenterOfMassFromChildren();
-
-
 };
 
 

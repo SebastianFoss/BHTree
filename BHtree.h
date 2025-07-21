@@ -115,7 +115,7 @@ public:
         root.reset(); // Release ownership of the previous root node
 
         // 2. Acquire a new root node from the pool, using the calculated tree bounds
-        root = std::unique_ptr<Node>(nodePool->acquireNode(treeBounds));
+        root = std::unique_ptr<Node>(nodePool->acquireNode(tree_bounds));
         if (!root) {
             throw std::runtime_error("Failed to acquire root node from NodePool.");
         }
@@ -132,7 +132,7 @@ public:
     void calculateForces(double theta) {
         // 1. Reset accumulated forces/accelerations for all particles
         for (auto& p_ptr : particles) {
-            p_ptr->resetAccumulatedForce(); // You'll need to add this method to Particle
+            p_ptr->resetAccumulatedForce();
         }
 
         // 2. For each particle, traverse the tree to calculate its total force
