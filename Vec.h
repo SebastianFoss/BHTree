@@ -20,7 +20,7 @@ struct Vec {
 
     double magnitude() const;
     void dot(Vec &other) const;
-    void normalize();
+    Vec normalized();
 
     // vector operations
 
