@@ -12,6 +12,9 @@
 #include "NodePool.h"
 #include "Particle.h"
 
+
+class NodePool;
+
 // class invariants yet to be added
 
 class Node {
@@ -22,16 +25,6 @@ private:
     Vec centerOfMass;
     Particle* particle; // points to a single particle if it is a leaf
     std::array<Node*, 8> children; // Nodepool-managed children pointers
-
-    void updateMassAndCenterOfMass(const Particle* p) {
-        if (totalMass == 0.0) {
-            centerOfMass = p->getPos();
-            totalMass = p->getMass();
-        }
-        else {
-            centerOfMass = (centerOfMass * totalMass) + (p->getPos() * p->getMass()) / (totalMass + p->getMass());
-        }
-    }
 
 
     // called only by NodePool
@@ -95,28 +88,47 @@ public:
         }
     };
 
+    void updateMassAndCenterOfMass(const Particle* p) {
+        if (totalMass == 0.0) {
+            centerOfMass = p->getPos();
+            totalMass = p->getMass();
+        }
+        else {
+            centerOfMass = (centerOfMass * totalMass) + (p->getPos() * p->getMass()) / (totalMass + p->getMass());
+        }
+    }
 
     void addParticle(Particle* newParticle, NodePool& pool) {
-        // first, update mass and center of mass
+        // update Node's total mass and center of mass
         updateMassAndCenterOfMass(newParticle);
 
-        if (isLeaf()) {
+        if (isLeaf()) { // if the current node contains no or one particles
             if (particle == nullptr) {
+                particle = newParticle;
                 // the node is currently empty so it becomes leaf
                 // now holds this particle as primary
-                particle = newParticle;
             }
             else {
                 // the node contains a particle
-                // move existing particle to appropriate child node
-
+                // 1. move existing particle to appropriate child node
                 Particle* oldParticle = particle;
                 particle = nullptr;
                 // this particle is no longer a leaf
 
+                // 2. subdivide the box into 8 octants
                 std::array<Box, 8> childBoxes = box.subdivide();
 
+                // 3. Get and populate 8 children nodes from pool for existing particle
+                int oldIndex = box.getOctantIndex(oldParticle->getPos());
+                if (children[oldIndex] == nullptr) {
+                    children[oldIndex] = pool.acquireNode(children); // allocates a node from pool
+                }
 
+                // 4. Insert the new particle into the appropriate child
+                int newID = box.getOctantIndex(newParticle->getPos());
+                if (children[newID] == nullptr) {
+                    children[newID] = pool.acquireNode(children)
+                }
 
             }
         }
