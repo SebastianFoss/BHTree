@@ -19,6 +19,7 @@ struct Vec {
 
 
     double magnitude() const;
+    double magnitude_sq() const;
     void dot(Vec &other) const;
     Vec normalized();
 
