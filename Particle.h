@@ -18,6 +18,9 @@ private:
     double mass;      // Mass of the particle
     int id;           // Unique identifier for the particle (useful for debugging/tracking)
 
+    double potential_phi;
+    // accumulated potential
+
 public:
     // Constructor: Initializes a particle with its properties.
     // Provides default values for velocity, acceleration, and ID for convenience.
@@ -58,6 +61,16 @@ public:
 
         // Reset acceleration for the next time step's force accumulation.
         acc = Vec();
+    }
+
+    // ADDED: Resets the accumulated potential for the current time step.
+    void resetPotentialPhi() {
+        potential_phi = 0.0;
+    }
+
+    // ADDED: Adds a scalar potential value to the particle's accumulated potential.
+    void addPotentialPhi(double phi) {
+        potential_phi += phi;
     }
 };
 

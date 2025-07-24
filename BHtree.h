@@ -25,8 +25,9 @@ private:
     // the pointers own the particles fully
 
     // the initial node which will recursively expand the tree
-    // BHtree owns the root, which means must be unique
-    std::unique_ptr<Node> root;
+    // Nodepool owns the root
+    // BHtree does not own the root, which means must not be unique
+    Node* root;
 
     // the pool of all free nodes
     // a pointer for strong ownership, and no need to construct initially
@@ -73,7 +74,9 @@ private:
         double dx = max_x - min_x;
         double dy = max_y - min_y;
         double dz = max_z - min_z;
-        double max_dim = std::max(dx, dy, dz);
+        double max_dim1 = std::max(dx, dy);
+        double max_dim = std::max(max_dim1, dz);
+
 
         // Add a small epsilon to ensure particles are strictly inside
         double padding = max_dim * 0.01;
@@ -111,11 +114,18 @@ public:
 
     void buildTree() {
         // 1. Release all nodes from the previous tree (if any) back to the pool
-        nodePool->resetPool(); // This should make all nodes available for reuse
-        root.reset(); // Release ownership of the previous root node
+        // nodePool->resetPool(); // This should make all nodes available for reuse
+        // root.reset(); // Release ownership of the previous root node
+        //
+        // // 2. Acquire a new root node from the pool, using the calculated tree bounds
+        // root = std::unique_ptr<Node>(nodePool->acquireNode(tree_bounds));
 
-        // 2. Acquire a new root node from the pool, using the calculated tree bounds
-        root = std::unique_ptr<Node>(nodePool->acquireNode(tree_bounds));
+        // reset to a raw pointer instead
+        root = nullptr;
+
+        // call nodePool acquireNode based on the tree bounds
+        root = nodePool->acquireNode(tree_bounds);
+
         if (!root) {
             throw std::runtime_error("Failed to acquire root node from NodePool.");
         }

@@ -11,11 +11,11 @@
 #include <limits> // For std::numeric_limits
 #include <cmath>  // For std::sqrt
 
+#include "NodePool.h"
 #include "Particle.h"
 
-// Forward declarations
 class NodePool;
-class Particle;
+struct Box;
 
 class Node {
 
@@ -35,18 +35,6 @@ private:
         }
         return true;
     }
-
-    // Node constructor (now public for std::make_unique but still intended for NodePool use)
-    Node(const Box& box_val)
-        : box(box_val),
-          totalMass(0.0),
-          centerOfMass(Vec()),
-          particle(nullptr) {
-        for (Node*& child : children) {
-            child = nullptr;
-        }
-    }
-
     friend class NodePool; // Allows NodePool to access private members/constructor
 
     // Helper to update the node's total mass and center of mass incrementally
@@ -61,6 +49,18 @@ private:
     }
 
 public:
+
+    // Node constructor (now public for std::make_unique but still intended for NodePool use)
+    Node(const Box& box_val)
+        : box(box_val),
+          totalMass(0.0),
+          centerOfMass(Vec()),
+          particle(nullptr) {
+        for (Node*& child : children) {
+            child = nullptr;
+        }
+    }
+
     // --- State Checkers ---
     bool isLeaf() const {
         return particle != nullptr || areAllChildrenNull();
@@ -89,7 +89,7 @@ public:
         return particle;
     }
 
-    // --- Core Node Operations ---
+    // Core node ops
 
     // Resets the node's state for reuse from the NodePool.
     void reset(const Box& new_box) {
@@ -102,40 +102,7 @@ public:
         }
     }
 
-    // Adds a particle to this node or recursively to one of its children.
-    void addParticle(Particle* newParticle, NodePool& pool) {
-        updateMassAndCenterOfMass(newParticle);
-
-        if (isEmpty()) {
-            particle = newParticle;
-        } else if (particle != nullptr) {
-            Particle* oldParticle = particle;
-            particle = nullptr;
-
-            std::array<Box, 8> childBoxes = box.subdivide();
-
-            int oldIndex = box.getOctantIndex(oldParticle->getPos());
-            if (children[oldIndex] == nullptr) {
-                children[oldIndex] = pool.acquireNode(childBoxes[oldIndex]);
-            }
-            children[oldIndex]->addParticle(oldParticle, pool);
-
-            int newIndex = box.getOctantIndex(newParticle->getPos());
-            if (children[newIndex] == nullptr) {
-                children[newIndex] = pool.acquireNode(childBoxes[newIndex]);
-            }
-            children[newIndex]->addParticle(newParticle, pool);
-
-        } else {
-            int targetIndex = box.getOctantIndex(newParticle->getPos());
-            std::array<Box, 8> childBoxes = box.subdivide();
-
-            if (children[targetIndex] == nullptr) {
-                children[targetIndex] = pool.acquireNode(childBoxes[targetIndex]);
-            }
-            children[targetIndex]->addParticle(newParticle, pool);
-        }
-    }
+    void addParticle(Particle *newParticle, NodePool &pool);
 
     // Recursively calculates the force exerted by this node (or its subtree) on a target particle.
     void calculateForceOn(Particle* target_particle, double theta, double G) const {
@@ -187,6 +154,42 @@ public:
     bool approximationCondition(double dist, double theta) const {
         double s = box.getSideLength();
         return (s / dist) < theta;
+    }
+
+    // Potential
+
+    void calculatePotentialOn(Particle* target_particle, double theta, double G, double softening_epsilon) const {
+        if (isEmpty()) {
+            return;
+        }
+        if (particle == target_particle && isLeaf()) {
+            return;
+        }
+
+        // calculate distance vec, and squared distance from target particle to this nodes CM
+        Vec r_vec = target_particle->getPos() - getCenterOfMass();
+        double dist_sq = r_vec.magnitude_sq();
+
+        // apply the softening parameter and check for epsilon
+        double softened_dist_sq = dist_sq + (softening_epsilon * softening_epsilon);
+        if (softened_dist_sq < std::numeric_limits<double>::epsilon()) {
+            return;
+        }
+        double dist = std::sqrt(dist_sq);
+        // used for theta criterion
+
+        // Barnes-Hut calculation
+        if (approximationCondition(dist, theta)) {
+            // if met,
+            // potential = -G * M /
+        }
+
+
+    }
+
+
+    void calculateAccelerationOn(Particle* target_particle, double theta, double G) const {
+
     }
 };
 
